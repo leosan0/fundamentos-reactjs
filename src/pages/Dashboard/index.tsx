@@ -33,6 +33,23 @@ const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<Balance>({} as Balance);
 
+  const handleSortColumn = () => {
+    const sorted = [...transactions].sort((a, b) => {
+      // return +(a.title > b.title) || +(a.title === b.title) - 1;
+      if (a.category.title > b.category.title) {
+        return 1;
+      }
+      if (a.category.title < b.category.title) {
+        return -1;
+      }
+      return 0;
+    });
+
+    setTransactions(sorted);
+
+    console.log(sorted);
+  };
+
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
       const response = await api.get('/transactions');
@@ -92,7 +109,7 @@ const Dashboard: React.FC = () => {
           <table>
             <thead>
               <tr>
-                <th>Título</th>
+                <th onClick={handleSortColumn}>Título</th>
                 <th>Preço</th>
                 <th>Categoria</th>
                 <th>Data</th>
