@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   FiArrowLeft,
   FiMail,
@@ -8,24 +8,41 @@ import {
   FiTag,
   FiCalendar,
 } from 'react-icons/fi';
-import { FormHandles } from '@unform/core';
+import { FormHandles, useField } from '@unform/core';
 import { Form } from '@unform/web';
 
 import Header from '../../components/Header';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-import { Container, Content, AnimationContainer } from './styles';
+import {
+  Container,
+  Inputs,
+  RadioGroup,
+  Content,
+  AnimationContainer,
+} from './styles';
+
+import api from '../../services/api';
 
 interface InsertFormData {
-  name: string;
-  email: string;
-  password: string;
+  title: string;
+  value: number;
+  type: string;
+  category: string;
 }
 
 const Insert: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
+  const handleSubmit = useCallback(async (data: InsertFormData) => {
+    try {
+      console.log(data);
+      // await api.post('/transactions', data);
+    } catch (err) {
+      console.log(err.response.error);
+    }
+  }, []);
   // const handleSubmit = useCallback(
   //   async (data: SignUpFormData) => {
   //     try {
@@ -78,13 +95,19 @@ const Insert: React.FC = () => {
         {/* <Background /> */}
         <Content>
           <AnimationContainer>
-            <Form ref={formRef} onSubmit={() => console.log('submit')}>
-              <h1>Faça seu cadastro</h1>
+            <Form ref={formRef} onSubmit={handleSubmit}>
+              <h1>Cadastre sua transação</h1>
 
               <Input name="title" icon={FiUser} placeholder="Título" />
               <Input name="price" icon={FiDollarSign} placeholder="Preço" />
               <Input name="category" icon={FiTag} placeholder="Categoria" />
-              <Input name="date" icon={FiCalendar} placeholder="Data" />
+              {/* <Input name="date" icon={FiCalendar} placeholder="Data" /> */}
+              <RadioGroup>
+                <label htmlFor="income">Income</label>
+                <input type="radio" name="type" value="income" />
+                <label htmlFor="outcome">Outcome</label>
+                <input type="radio" name="type" value="outcome" />
+              </RadioGroup>
 
               <Button type="submit">Inserir</Button>
             </Form>

@@ -43,7 +43,7 @@ export const Footer = styled.section`
 
   button {
     background: #ff872c;
-    color: #fff;
+    color: #312e38;
     border-radius: 5px;
     padding: 15px 80px;
     border: 0;
