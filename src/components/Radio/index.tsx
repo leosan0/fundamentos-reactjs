@@ -1,21 +1,43 @@
-import React, { useEffect, useRef } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  InputHTMLAttributes,
+} from 'react';
 import { useField } from '@unform/core';
 
-export default function Radio({ name, options }) {
-  const inputRefs = useRef([]);
+import { Container } from './styles';
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  name: string;
+  options: {
+    id: string;
+    value: string;
+    label: string;
+  }[];
+}
+
+const Radio: React.FC<InputProps> = ({ name, options }) => {
+  const inputRefs = useRef<HTMLInputElement[]>([]);
   const { fieldName, registerField, defaultValue } = useField(name);
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleLabelClick = useCallback(() => {
+    setIsChecked(!isChecked);
+  }, [isChecked]);
 
   useEffect(() => {
     registerField({
       name: fieldName,
-      path: 'value',
+      // path: 'value',
       ref: inputRefs.current,
-      getValue(refs) {
+      getValue: (refs: HTMLInputElement[]) => {
         const checked = refs.find(ref => ref.checked);
 
         return checked ? checked.value : null;
       },
-      setValue(refs, value) {
+      setValue: (refs: HTMLInputElement[], value: string) => {
         const item = refs.find(ref => ref.value === value);
 
         if (item) {
@@ -26,19 +48,25 @@ export default function Radio({ name, options }) {
   }, [fieldName, registerField]);
 
   return (
-    <div>
+    <Container>
       {options.map((option, index) => (
-        <label key={option.id}>
+        <label htmlFor={option.id} key={option.id}>
           <input
-            ref={elRef => (inputRefs.current[index] = elRef)}
+            ref={ref => {
+              inputRefs.current[index] = ref as HTMLInputElement;
+            }}
             type="radio"
             name={fieldName}
             value={option.id}
+            checked={isChecked}
             defaultChecked={defaultValue === option.id}
           />
-          <span>{option.label}</span>
+          {/* <span>{option.label}</span> */}
+          {option.label}
         </label>
       ))}
-    </div>
+    </Container>
   );
-}
+};
+
+export default Radio;

@@ -13,6 +13,7 @@ import { Form } from '@unform/web';
 
 import Header from '../../components/Header';
 import Input from '../../components/Input';
+import Radio from '../../components/Radio';
 import Button from '../../components/Button';
 
 import {
@@ -32,8 +33,19 @@ interface InsertFormData {
   category: string;
 }
 
+interface RadioOption {
+  id: string;
+  value: string;
+  label: string;
+}
+
 const Insert: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
+  const radioOptions: RadioOption[] = [
+    { id: 'income', value: 'income', label: 'Entrada' },
+    { id: 'outcome', value: 'outcome', label: 'Saída' },
+  ];
 
   const handleSubmit = useCallback(async (data: InsertFormData) => {
     try {
@@ -95,19 +107,19 @@ const Insert: React.FC = () => {
         {/* <Background /> */}
         <Content>
           <AnimationContainer>
-            <Form ref={formRef} onSubmit={handleSubmit}>
+            <Form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              initialData={{ type: 'income' }}
+            >
               <h1>Cadastre sua transação</h1>
 
               <Input name="title" icon={FiUser} placeholder="Título" />
               <Input name="price" icon={FiDollarSign} placeholder="Preço" />
               <Input name="category" icon={FiTag} placeholder="Categoria" />
               {/* <Input name="date" icon={FiCalendar} placeholder="Data" /> */}
-              <RadioGroup>
-                <label htmlFor="income">Income</label>
-                <input type="radio" name="type" value="income" />
-                <label htmlFor="outcome">Outcome</label>
-                <input type="radio" name="type" value="outcome" />
-              </RadioGroup>
+
+              <Radio name="type" options={radioOptions} />
 
               <Button type="submit">Inserir</Button>
             </Form>
