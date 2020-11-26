@@ -1,16 +1,15 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-export const Container = styled.div`
-  /* background: #f8f8fc;
-  border-radius: 10px;
-  padding: 16px;
-  width: 100%;
+interface ContainerProps {
+  optionChecked: string;
+}
 
-  border: 2px solid #e6e6f0;
-  color: #666360;
+export const RadioGroup = styled.div``;
 
-  display: flex;
-  align-items: center; */
+export const Container = styled.div<ContainerProps>`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0.5rem;
 
   height: 100%;
   min-height: 100%;
@@ -20,26 +19,36 @@ export const Container = styled.div`
   text-align: center;
 
   input {
-    //display: none;
-    height: 100%
-    width: 100%;
+    position: absolute;
+    left: -9999px;
+    width: 0;
+    height: 0;
+    visibility: hidden;
   }
 
   label {
+    width: 100%;
     display: inline-block;
-    padding: 1em 5.6em;
+    padding: 1em;
     cursor: pointer;
     color: #666360;
     border-radius: 10px;
     border: 2px solid #e6e6f0;
     background: #f8f8fc;
-    /* box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.22); */
+
     transition: 0.3s;
     user-select: none;
   }
 
-  label + label {
-    margin-left: 0.5em;
+  input:checked + label {
+    background: ${props => {
+      if (props.optionChecked === 'income') {
+        return '#12a454';
+      }
+      if (props.optionChecked === 'outcome') {
+        return '#e83f5b';
+      }
+    }};
+    color: #fff;
   }
 `;

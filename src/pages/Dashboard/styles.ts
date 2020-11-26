@@ -90,6 +90,17 @@ export const TableContainer = styled.section`
 
     td:last-child {
       border-radius: 0 8px 8px 0;
+      width: 1px;
+    }
+
+    button {
+      color: #969cb3;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      border: none;
+      transition: 0.1s;
     }
   }
 `;

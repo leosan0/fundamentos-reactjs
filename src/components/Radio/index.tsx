@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useField } from '@unform/core';
 
-import { Container } from './styles';
+import { Container, RadioGroup } from './styles';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -21,11 +21,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Radio: React.FC<InputProps> = ({ name, options }) => {
   const inputRefs = useRef<HTMLInputElement[]>([]);
   const { fieldName, registerField, defaultValue } = useField(name);
-  const [isChecked, setIsChecked] = useState(false);
+  const [optionChecked, setOptionChecked] = useState('income');
 
-  const handleLabelClick = useCallback(() => {
-    setIsChecked(!isChecked);
-  }, [isChecked]);
+  const handleCheck = useCallback(() => {
+    const checked = inputRefs.current.find(ref => ref.checked);
+
+    setOptionChecked(checked.value);
+  }, []);
 
   useEffect(() => {
     registerField({
@@ -48,22 +50,22 @@ const Radio: React.FC<InputProps> = ({ name, options }) => {
   }, [fieldName, registerField]);
 
   return (
-    <Container>
+    <Container optionChecked={optionChecked}>
       {options.map((option, index) => (
-        <label htmlFor={option.id} key={option.id}>
+        <RadioGroup key={option.id}>
           <input
+            id={option.id}
             ref={ref => {
               inputRefs.current[index] = ref as HTMLInputElement;
             }}
             type="radio"
             name={fieldName}
             value={option.id}
-            checked={isChecked}
             defaultChecked={defaultValue === option.id}
+            onChange={handleCheck}
           />
-          {/* <span>{option.label}</span> */}
-          {option.label}
-        </label>
+          <label htmlFor={option.id}>{option.label}</label>
+        </RadioGroup>
       ))}
     </Container>
   );

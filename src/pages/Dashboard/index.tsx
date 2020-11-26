@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+import { FiTrash } from 'react-icons/fi';
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
 import total from '../../assets/total.svg';
@@ -77,6 +78,53 @@ const Dashboard: React.FC = () => {
     loadTransactions();
   }, []);
 
+  async function handleDelete(id: string): Promise<void> {
+    try {
+      await api.delete(`/transactions/${id}`);
+
+      const transactionsFiltered = transactions.filter(
+        transaction => transaction.id !== id,
+      );
+      setTransactions(transactionsFiltered);
+
+      const { income, outcome } = transactionsFiltered.reduce(
+        (accumulator, transaction) => {
+          switch (transaction.type) {
+            case 'income':
+              accumulator.income += Number(transaction.value);
+              break;
+
+            case 'outcome':
+              accumulator.outcome += Number(transaction.value);
+              break;
+
+            default:
+              break;
+          }
+
+          return accumulator;
+        },
+        {
+          income: 0,
+          outcome: 0,
+          total: 0,
+        },
+      );
+
+      const total = income - outcome;
+
+      const balanceFormatted = {
+        income: formatValue(income),
+        outcome: formatValue(outcome),
+        total: formatValue(total),
+      };
+
+      setBalance(balanceFormatted);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -113,6 +161,7 @@ const Dashboard: React.FC = () => {
                 <th>Preço</th>
                 <th>Categoria</th>
                 <th>Data</th>
+                <th />
               </tr>
             </thead>
 
@@ -126,6 +175,15 @@ const Dashboard: React.FC = () => {
                   </td>
                   <td>{transaction.category.title}</td>
                   <td>{transaction.formattedDate}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="icon"
+                      onClick={() => handleDelete(transaction.id)}
+                    >
+                      <FiTrash size={20} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
