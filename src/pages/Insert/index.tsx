@@ -21,13 +21,7 @@ import Input from '../../components/Input';
 import Radio from '../../components/Radio';
 import Button from '../../components/Button';
 
-import {
-  Container,
-  Inputs,
-  RadioGroup,
-  Content,
-  AnimationContainer,
-} from './styles';
+import { Container, Content, AnimationContainer } from './styles';
 
 import api from '../../services/api';
 

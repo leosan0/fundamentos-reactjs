@@ -24,24 +24,6 @@ export const Content = styled.div`
   max-width: 700px;
 `;
 
-export const Inputs = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  column-gap: 1.6rem;
-`;
-
-export const RadioGroup = styled.div`
-  color: #666360;
-
-  input {
-    margin-left: 4px;
-  }
-
-  label {
-    margin-left: 4px;
-  }
-`;
-
 const appearFromRight = keyframes`
   from {
     opacity: 0;
