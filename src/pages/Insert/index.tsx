@@ -1,9 +1,7 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useEffect, useState } from 'react';
 import {
   FiArrowLeft,
-  FiMail,
   FiUser,
-  FiLock,
   FiDollarSign,
   FiTag,
   FiCalendar,
@@ -20,10 +18,16 @@ import Header from '../../components/Header';
 import Input from '../../components/Input';
 import Radio from '../../components/Radio';
 import Button from '../../components/Button';
+import Select from '../../components/Select';
 
 import { Container, Content, AnimationContainer } from './styles';
 
 import api from '../../services/api';
+
+interface Category {
+  id: string;
+  title: string;
+}
 
 interface InsertFormData {
   title: string;
@@ -38,9 +42,15 @@ interface RadioOption {
   label: string;
 }
 
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
 const Insert: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const history = useHistory();
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const radioOptions: RadioOption[] = [
     { id: 'income', value: 'income', label: 'Entrada' },
@@ -56,7 +66,7 @@ const Insert: React.FC = () => {
         const schema = Yup.object().shape({
           title: Yup.string().required('Nome obrigatório'),
           value: Yup.number().required('Valor obrigatório'),
-          category: Yup.string().required('Categoria obrigatória'),
+          category: Yup.string().ensure().required('Categoria obrigatória'),
         });
 
         await schema.validate(data, {
@@ -76,6 +86,23 @@ const Insert: React.FC = () => {
     },
     [history],
   );
+
+  useEffect(() => {
+    async function loadCategories(): Promise<void> {
+      const response = await api.get('/categories');
+
+      const categoriesOptions = response.data.map((category: Category) => {
+        return {
+          value: category.title,
+          label: category.title,
+        };
+      });
+
+      setCategories(categoriesOptions);
+    }
+
+    loadCategories();
+  }, []);
   // const handleSubmit = useCallback(
   //   async (data: SignUpFormData) => {
   //     try {
@@ -137,7 +164,12 @@ const Insert: React.FC = () => {
 
               <Input name="title" icon={FiUser} placeholder="Título" />
               <Input name="value" icon={FiDollarSign} placeholder="Preço" />
-              <Input name="category" icon={FiTag} placeholder="Categoria" />
+              <Select
+                name="category"
+                icon={FiTag}
+                placeholder="Categoria"
+                options={categories}
+              />
               {/* <Input name="date" icon={FiCalendar} placeholder="Data" /> */}
 
               <Radio name="type" options={radioOptions} />
