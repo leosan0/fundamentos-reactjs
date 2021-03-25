@@ -12,7 +12,7 @@ export const Container = styled.div`
   width: 100%;
   max-width: 40rem;
   border-radius: 0.8rem;
-  margin: -3.2rem auto 3.2rem;
+  margin: -1.5rem auto 3.2rem;
   padding-top: 1.4rem;
 `;
 

@@ -150,7 +150,7 @@ const Insert: React.FC = () => {
 
   return (
     <>
-      <Header />
+      <Header size="small" />
       <Container>
         {/* <Background /> */}
         <Content>
