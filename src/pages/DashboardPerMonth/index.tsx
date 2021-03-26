@@ -37,25 +37,14 @@ interface Balance {
   total: string;
 }
 
-const colourOptions = [
-  { value: 'outcome', label: 'Ocean', color: '#00B8D9', isFixed: true },
-  { value: 'blue', label: 'Blue', color: '#0052CC', isDisabled: true },
-  { value: 'purple', label: 'Purple', color: '#5243AA' },
-  { value: 'red', label: 'Red', color: '#FF5630', isFixed: true },
-  { value: 'orange', label: 'Orange', color: '#FF8B00' },
-  { value: 'yellow', label: 'Yellow', color: '#FFC400' },
-  { value: 'green', label: 'Green', color: '#36B37E' },
-  { value: 'forest', label: 'Forest', color: '#00875A' },
-  { value: 'slate', label: 'Slate', color: '#253858' },
-  { value: 'silver', label: 'Silver', color: '#666666' },
-];
-
 const DashboardPerMonth: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<Balance>({} as Balance);
 
-  const [searchValue, setSearchValue] = useState('');
+  const [filterMonth, setFilterMonth] = useState('10');
+  const [filterYear, setFilterYear] = useState('2020');
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleSortColumn = () => {
     const sorted = [...transactions].sort((a, b) => {
       // return +(a.title > b.title) || +(a.title === b.title) - 1;
@@ -75,9 +64,15 @@ const DashboardPerMonth: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get(`/transactions`);
+      const response = await api.get('/transactions');
 
-      const transactionsFormatted = response.data.transactions.map(
+      const transactionsFiltered = response.data.transactions.filter(
+        (transaction: Transaction) =>
+          new Date(transaction.created_at).getMonth() === Number(filterMonth) &&
+          new Date(transaction.created_at).getFullYear() === Number(filterYear),
+      );
+
+      const transactionsFormatted = transactionsFiltered.map(
         (transaction: Transaction) => ({
           ...transaction,
           formattedValue: formatValue(transaction.value),
@@ -98,7 +93,7 @@ const DashboardPerMonth: React.FC = () => {
     }
 
     loadTransactions();
-  }, []);
+  }, [filterMonth, filterYear]);
 
   async function handleDelete(id: string): Promise<void> {
     try {
@@ -176,18 +171,40 @@ const DashboardPerMonth: React.FC = () => {
         </CardContainer>
 
         <TableFilter>
+          <label htmlFor="year">Escolha um ano:</label>
+
+          <select
+            name="year"
+            id="year"
+            value={filterYear}
+            onChange={e => setFilterYear(e.target.value)}
+          >
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+          </select>
+        </TableFilter>
+
+        <TableFilter>
           <label htmlFor="month">Escolha um mês:</label>
 
           <select
             name="month"
             id="month"
-            value={searchValue}
-            onChange={e => setSearchValue(e.target.value)}
+            value={filterMonth}
+            onChange={e => setFilterMonth(e.target.value)}
           >
-            <option value="09">Setembro</option>
-            <option value="outcome">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
+            <option value="00">Janeiro</option>
+            <option value="01">Fevereiro</option>
+            <option value="02">Março</option>
+            <option value="03">Abril</option>
+            <option value="04">Maio</option>
+            <option value="05">Junho</option>
+            <option value="06">Julho</option>
+            <option value="07">Agosto</option>
+            <option value="08">Setembro</option>
+            <option value="09">Outubro</option>
+            <option value="10">Novembro</option>
+            <option value="11">Dezembro</option>
           </select>
         </TableFilter>
 
