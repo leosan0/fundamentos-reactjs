@@ -40,6 +40,9 @@ interface Balance {
 const DashboardPerMonth: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<Balance>({} as Balance);
+  const [filteredBalance, setfilteredBalance] = useState<Balance>(
+    {} as Balance,
+  );
 
   const [filterMonth, setFilterMonth] = useState('10');
   const [filterYear, setFilterYear] = useState('2020');
@@ -207,6 +210,30 @@ const DashboardPerMonth: React.FC = () => {
             <option value="11">Dezembro</option>
           </select>
         </TableFilter>
+
+        <CardContainer>
+          <Card>
+            <header>
+              <p>Entradas</p>
+              <img src={income} alt="Income" />
+            </header>
+            <h1 data-testid="balance-income">{balance.income}</h1>
+          </Card>
+          <Card>
+            <header>
+              <p>Saídas</p>
+              <img src={outcome} alt="Outcome" />
+            </header>
+            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
+          </Card>
+          <Card total>
+            <header>
+              <p>Total</p>
+              <img src={total} alt="Total" />
+            </header>
+            <h1 data-testid="balance-total">{balance.total}</h1>
+          </Card>
+        </CardContainer>
 
         <TableContainer>
           <table>
