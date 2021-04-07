@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { FiTrash } from 'react-icons/fi';
 
@@ -29,6 +29,7 @@ interface Transaction {
   type: 'income' | 'outcome';
   category: { title: string };
   created_at: Date;
+  date: Date;
 }
 
 interface Balance {
@@ -44,8 +45,8 @@ const DashboardPerMonth: React.FC = () => {
     {} as Balance,
   );
 
-  const [filterMonth, setFilterMonth] = useState('10');
-  const [filterYear, setFilterYear] = useState('2020');
+  const [filterMonth, setFilterMonth] = useState('04');
+  const [filterYear, setFilterYear] = useState('2021');
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleSortColumn = () => {
@@ -67,21 +68,24 @@ const DashboardPerMonth: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get('/transactions');
+      const response = await api.get('/transactions/filtered', {
+        params: {
+          month: filterMonth,
+          year: filterYear,
+        },
+      });
 
-      const transactionsFiltered = response.data.transactions.filter(
-        (transaction: Transaction) =>
-          new Date(transaction.created_at).getMonth() === Number(filterMonth) &&
-          new Date(transaction.created_at).getFullYear() === Number(filterYear),
-      );
+      // const transactionsFiltered = response.data.transactions.filter(
+      //   (transaction: Transaction) =>
+      //     new Date(transaction.created_at).getMonth() === Number(filterMonth) &&
+      //     new Date(transaction.created_at).getFullYear() === Number(filterYear),
+      // );
 
-      const transactionsFormatted = transactionsFiltered.map(
+      const transactionsFormatted = response.data.transactions.map(
         (transaction: Transaction) => ({
           ...transaction,
           formattedValue: formatValue(transaction.value),
-          formattedDate: new Date(transaction.created_at).toLocaleDateString(
-            'pt-br',
-          ),
+          formattedDate: new Date(transaction.date).toLocaleDateString('pt-br'),
         }),
       );
 
@@ -196,44 +200,20 @@ const DashboardPerMonth: React.FC = () => {
             value={filterMonth}
             onChange={e => setFilterMonth(e.target.value)}
           >
-            <option value="00">Janeiro</option>
-            <option value="01">Fevereiro</option>
-            <option value="02">Março</option>
-            <option value="03">Abril</option>
-            <option value="04">Maio</option>
-            <option value="05">Junho</option>
-            <option value="06">Julho</option>
-            <option value="07">Agosto</option>
-            <option value="08">Setembro</option>
-            <option value="09">Outubro</option>
-            <option value="10">Novembro</option>
-            <option value="11">Dezembro</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
           </select>
         </TableFilter>
-
-        <CardContainer>
-          <Card>
-            <header>
-              <p>Entradas</p>
-              <img src={income} alt="Income" />
-            </header>
-            <h1 data-testid="balance-income">{balance.income}</h1>
-          </Card>
-          <Card>
-            <header>
-              <p>Saídas</p>
-              <img src={outcome} alt="Outcome" />
-            </header>
-            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
-          </Card>
-          <Card total>
-            <header>
-              <p>Total</p>
-              <img src={total} alt="Total" />
-            </header>
-            <h1 data-testid="balance-total">{balance.total}</h1>
-          </Card>
-        </CardContainer>
 
         <TableContainer>
           <table>

@@ -19,6 +19,7 @@ import Input from '../../components/Input';
 import Radio from '../../components/Radio';
 import Button from '../../components/Button';
 import Select from '../../components/Select';
+import DatePicker from '../../components/DatePicker';
 
 import { Container, Content, AnimationContainer } from './styles';
 
@@ -34,6 +35,7 @@ interface InsertFormData {
   value: number;
   type: string;
   category: string;
+  date: Date;
 }
 
 interface RadioOption {
@@ -67,6 +69,7 @@ const Insert: React.FC = () => {
           title: Yup.string().required('Nome obrigatório'),
           value: Yup.number().required('Valor obrigatório'),
           category: Yup.string().ensure().required('Categoria obrigatória'),
+          date: Yup.date(),
         });
 
         await schema.validate(data, {
@@ -170,7 +173,12 @@ const Insert: React.FC = () => {
                 placeholder="Categoria"
                 options={categories}
               />
-              {/* <Input name="date" icon={FiCalendar} placeholder="Data" /> */}
+
+              <DatePicker
+                name="date"
+                icon={FiCalendar}
+                placeholderText="Data"
+              />
 
               <Radio name="type" options={radioOptions} />
 
