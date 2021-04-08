@@ -4,6 +4,7 @@ import { useField } from '@unform/core';
 
 import { IconBaseProps } from 'react-icons';
 import { FiAlertCircle } from 'react-icons/fi';
+import { isPropertySignature } from 'typescript';
 import { Container, CustomSelect, Error } from './styles';
 
 interface Props extends SelectProps<OptionTypeBase> {
@@ -19,8 +20,10 @@ const Select: React.FC<Props> = ({ name, icon: Icon, ...rest }) => {
 
   const handleSelectBlur = useCallback(() => {
     setIsFocused(false);
+  }, []);
 
-    setIsFilled(!!selectRef.current?.value);
+  const handleSelectChange = useCallback(() => {
+    setIsFilled(true);
   }, []);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ const Select: React.FC<Props> = ({ name, icon: Icon, ...rest }) => {
         ref={selectRef}
         classNamePrefix="react-select"
         onFocus={() => setIsFocused(true)}
+        onChange={handleSelectChange}
         onBlur={handleSelectBlur}
         {...rest}
       />

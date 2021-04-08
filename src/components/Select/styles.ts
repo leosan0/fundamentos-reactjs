@@ -48,6 +48,7 @@ export const Container = styled.div<ContainerProps>`
     css`
       color: #ff9000;
     `}
+  }
 `;
 
 export const CustomSelect = styled(ReactSelect)`

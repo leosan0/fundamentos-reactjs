@@ -43,7 +43,7 @@ export const Container = styled.div<ContainerProps>`
       color: #ff9000;
     `}
 
-  input {
+    input {
     flex: 1; /* ocupa a área toda */
     background: transparent;
     border: 0;

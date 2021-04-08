@@ -3,6 +3,7 @@ import { IconBaseProps } from 'react-icons';
 import { FiAlertCircle } from 'react-icons/fi';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import { useField } from '@unform/core';
+import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { Container, Error } from './styles';
@@ -28,7 +29,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const handleDatePickerBlur = useCallback(() => {
     setIsFocused(false);
 
-    setIsFilled(!!datepickerRef.current?.props.value);
+    setIsFilled(!!moment(datepickerRef.current?.props.value).format());
   }, []);
 
   useEffect(() => {
@@ -60,7 +61,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
         onSelect={handleDatePickerBlur}
         selected={date}
         onChange={setDate}
-        // onBlur={handleDatePickerBlur}
         {...rest}
       />
 
