@@ -3,10 +3,9 @@ import { shade } from 'polished';
 
 export const Container = styled.div`
   /* height: 100vh;
-  display: flex;
-  display: flex;
   align-items: stretch;
   */
+
   height: 70vh;
   background: #ffffff;
   width: 100%;

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 
 import {
   FiUser,
@@ -8,7 +8,11 @@ import {
   FiCheckSquare,
 } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 import { Form } from './styles';
+
+import getValidationErrors from '../../utils/getValidationErrors';
+
 import Modal from '../Modal';
 import Input from '../Input';
 import Radio from '../Radio';
@@ -16,12 +20,14 @@ import Button from '../Button';
 import Select from '../Select';
 import DatePicker from '../DatePicker';
 
+import api from '../../services/api';
+
 interface ICategory {
   id: string;
   title: string;
 }
 
-interface IInsertFormData {
+interface ICreateTransactionFormData {
   title: string;
   value: number;
   type: string;
@@ -43,7 +49,7 @@ interface ISelectOption {
 interface IModalProps {
   isOpen: boolean;
   setIsOpen: () => void;
-  handleAddTransaction: (food: IInsertFormData) => void;
+  handleAddTransaction: (food: ICreateTransactionFormData) => void;
 }
 
 const ModalAddTransaction: React.FC<IModalProps> = ({
@@ -60,13 +66,51 @@ const ModalAddTransaction: React.FC<IModalProps> = ({
   ];
 
   const handleSubmit = useCallback(
-    async (data: IInsertFormData) => {
-      handleAddTransaction(data);
+    async (data: ICreateTransactionFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-      setIsOpen();
+        const schema = Yup.object().shape({
+          title: Yup.string().required('Nome obrigatório'),
+          value: Yup.number().required('Valor obrigatório'),
+          Icategory: Yup.string().ensure().required('Categoria obrigatória'),
+          date: Yup.date(),
+        });
+
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        handleAddTransaction(data);
+
+        setIsOpen();
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+
+          formRef.current?.setErrors(errors);
+        }
+      }
     },
     [handleAddTransaction, setIsOpen],
   );
+
+  useEffect(() => {
+    async function loadCategories(): Promise<void> {
+      const response = await api.get('/categories');
+
+      const categoriesOptions = response.data.map((category: ICategory) => {
+        return {
+          value: category.title,
+          label: category.title,
+        };
+      });
+
+      setCategories(categoriesOptions);
+    }
+
+    loadCategories();
+  }, []);
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
