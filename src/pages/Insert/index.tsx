@@ -1,11 +1,5 @@
 import React, { useCallback, useRef, useEffect, useState } from 'react';
-import {
-  FiArrowLeft,
-  FiUser,
-  FiDollarSign,
-  FiTag,
-  FiCalendar,
-} from 'react-icons/fi';
+import { FiUser, FiDollarSign, FiTag, FiCalendar } from 'react-icons/fi';
 
 import { useHistory } from 'react-router-dom';
 import { FormHandles } from '@unform/core';
@@ -25,12 +19,12 @@ import { Container, Content, AnimationContainer } from './styles';
 
 import api from '../../services/api';
 
-interface Category {
+interface ICategory {
   id: string;
   title: string;
 }
 
-interface InsertFormData {
+interface IInsertFormData {
   title: string;
   value: number;
   type: string;
@@ -38,13 +32,13 @@ interface InsertFormData {
   date: Date;
 }
 
-interface RadioOption {
+interface IRadioOption {
   id: string;
   value: string;
   label: string;
 }
 
-interface SelectOption {
+interface ISelectOption {
   value: string;
   label: string;
 }
@@ -52,15 +46,15 @@ interface SelectOption {
 const Insert: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const history = useHistory();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
-  const radioOptions: RadioOption[] = [
+  const radioOptions: IRadioOption[] = [
     { id: 'income', value: 'income', label: 'Entrada' },
     { id: 'outcome', value: 'outcome', label: 'Saída' },
   ];
 
   const handleSubmit = useCallback(
-    async (data: InsertFormData) => {
+    async (data: IInsertFormData) => {
       try {
         // console.log(data);
         formRef.current?.setErrors({});
@@ -68,7 +62,7 @@ const Insert: React.FC = () => {
         const schema = Yup.object().shape({
           title: Yup.string().required('Nome obrigatório'),
           value: Yup.number().required('Valor obrigatório'),
-          category: Yup.string().ensure().required('Categoria obrigatória'),
+          Icategory: Yup.string().ensure().required('Categoria obrigatória'),
           date: Yup.date(),
         });
 
@@ -94,7 +88,7 @@ const Insert: React.FC = () => {
     async function loadCategories(): Promise<void> {
       const response = await api.get('/categories');
 
-      const categoriesOptions = response.data.map((category: Category) => {
+      const categoriesOptions = response.data.map((category: ICategory) => {
         return {
           value: category.title,
           label: category.title,

@@ -9,6 +9,7 @@ import total from '../../assets/total.svg';
 import api from '../../services/api';
 
 import Header from '../../components/Header';
+import ModalAddTransaction from '../../components/ModalAddTransaction';
 
 import formatValue from '../../utils/formatValue';
 
@@ -47,6 +48,7 @@ const DashboardPerMonth: React.FC = () => {
 
   const [filterMonth, setFilterMonth] = useState('04');
   const [filterYear, setFilterYear] = useState('2021');
+  const [modalOpen, setModalOpen] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleSortColumn = () => {
@@ -149,9 +151,20 @@ const DashboardPerMonth: React.FC = () => {
     }
   }
 
+  async function handleAddTransaction(): Promise<void> {}
+
+  function toggleModal(): void {
+    setModalOpen(!modalOpen);
+  }
+
   return (
     <>
-      <Header />
+      <Header openModal={toggleModal} />
+      <ModalAddTransaction
+        isOpen={modalOpen}
+        setIsOpen={toggleModal}
+        handleAddTransaction={handleAddTransaction}
+      />
       <Container>
         <CardContainer>
           <Card>
