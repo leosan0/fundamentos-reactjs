@@ -43,7 +43,10 @@ export const Container = styled.div<ContainerProps>`
       color: #ff9000;
     `}
 
+    .react-datepicker-wrapper ,
+    .react-datepicker__input-container,
     input {
+    display: flex;
     flex: 1; /* ocupa a área toda */
     background: transparent;
     border: 0;

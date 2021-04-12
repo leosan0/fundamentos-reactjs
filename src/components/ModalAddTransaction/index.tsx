@@ -20,8 +20,6 @@ import Button from '../Button';
 import Select from '../Select';
 import DatePicker from '../DatePicker';
 
-import api from '../../services/api';
-
 interface ICategory {
   id: string;
   title: string;
@@ -49,21 +47,29 @@ interface ISelectOption {
 interface IModalProps {
   isOpen: boolean;
   setIsOpen: () => void;
-  handleAddTransaction: (food: ICreateTransactionFormData) => void;
+  handleAddTransaction: (transaction: ICreateTransactionFormData) => void;
+  categories: ICategory[];
 }
 
 const ModalAddTransaction: React.FC<IModalProps> = ({
   isOpen,
   setIsOpen,
   handleAddTransaction,
+  categories,
 }) => {
   const formRef = useRef<FormHandles>(null);
-  const [categories, setCategories] = useState<ICategory[]>([]);
 
   const radioOptions: IRadioOption[] = [
     { id: 'income', value: 'income', label: 'Entrada' },
     { id: 'outcome', value: 'outcome', label: 'Saída' },
   ];
+
+  const categoriesOptions = categories.map((category: ICategory) => {
+    return {
+      value: category.title,
+      label: category.title,
+    };
+  });
 
   const handleSubmit = useCallback(
     async (data: ICreateTransactionFormData) => {
@@ -73,7 +79,7 @@ const ModalAddTransaction: React.FC<IModalProps> = ({
         const schema = Yup.object().shape({
           title: Yup.string().required('Nome obrigatório'),
           value: Yup.number().required('Valor obrigatório'),
-          Icategory: Yup.string().ensure().required('Categoria obrigatória'),
+          category: Yup.string().ensure().required('Categoria obrigatória'),
           date: Yup.date(),
         });
 
@@ -95,23 +101,6 @@ const ModalAddTransaction: React.FC<IModalProps> = ({
     [handleAddTransaction, setIsOpen],
   );
 
-  useEffect(() => {
-    async function loadCategories(): Promise<void> {
-      const response = await api.get('/categories');
-
-      const categoriesOptions = response.data.map((category: ICategory) => {
-        return {
-          value: category.title,
-          label: category.title,
-        };
-      });
-
-      setCategories(categoriesOptions);
-    }
-
-    loadCategories();
-  }, []);
-
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
       <Form
@@ -127,7 +116,7 @@ const ModalAddTransaction: React.FC<IModalProps> = ({
           name="category"
           icon={FiTag}
           placeholder="Categoria"
-          options={categories}
+          options={categoriesOptions}
         />
 
         <DatePicker name="date" icon={FiCalendar} placeholderText="Data" />

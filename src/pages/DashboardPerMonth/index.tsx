@@ -21,7 +21,7 @@ import {
   TableContainer,
 } from './styles';
 
-interface Transaction {
+interface ITransaction {
   id: string;
   title: string;
   value: number;
@@ -33,19 +33,33 @@ interface Transaction {
   date: Date;
 }
 
-interface Balance {
+interface ICreateTransactionFormData {
+  title: string;
+  value: number;
+  type: string;
+  category: string;
+  date: Date;
+}
+
+interface IBalance {
   income: string;
   outcome: string;
   total: string;
 }
 
+interface ICategory {
+  id: string;
+  title: string;
+}
+
 const DashboardPerMonth: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState<Balance>({} as Balance);
-  const [filteredBalance, setfilteredBalance] = useState<Balance>(
-    {} as Balance,
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [balance, setBalance] = useState<IBalance>({} as IBalance);
+  const [filteredBalance, setfilteredBalance] = useState<IBalance>(
+    {} as IBalance,
   );
 
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [filterMonth, setFilterMonth] = useState('04');
   const [filterYear, setFilterYear] = useState('2021');
   const [modalOpen, setModalOpen] = useState(false);
@@ -84,7 +98,7 @@ const DashboardPerMonth: React.FC = () => {
       // );
 
       const transactionsFormatted = response.data.transactions.map(
-        (transaction: Transaction) => ({
+        (transaction: ITransaction) => ({
           ...transaction,
           formattedValue: formatValue(transaction.value),
           formattedDate: new Date(transaction.date).toLocaleDateString('pt-br'),
@@ -102,6 +116,13 @@ const DashboardPerMonth: React.FC = () => {
     }
 
     loadTransactions();
+
+    async function loadCategories(): Promise<void> {
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    }
+
+    loadCategories();
   }, [filterMonth, filterYear]);
 
   async function handleDelete(id: string): Promise<void> {
@@ -151,7 +172,28 @@ const DashboardPerMonth: React.FC = () => {
     }
   }
 
-  async function handleAddTransaction(): Promise<void> {}
+  async function handleAddTransaction(
+    transaction: ICreateTransactionFormData,
+  ): Promise<void> {
+    console.log(transaction);
+    try {
+      const response = await api.post('/transactions', transaction);
+
+      const newTransaction = response.data;
+
+      const transactionFormatted = {
+        ...newTransaction,
+        formattedValue: formatValue(newTransaction.value),
+        formattedDate: new Date(newTransaction.date).toLocaleDateString(
+          'pt-br',
+        ),
+      };
+
+      setTransactions([...transactions, transactionFormatted]);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   function toggleModal(): void {
     setModalOpen(!modalOpen);
@@ -164,6 +206,7 @@ const DashboardPerMonth: React.FC = () => {
         isOpen={modalOpen}
         setIsOpen={toggleModal}
         handleAddTransaction={handleAddTransaction}
+        categories={categories}
       />
       <Container>
         <CardContainer>
