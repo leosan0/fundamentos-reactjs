@@ -21,6 +21,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-select": "^3.1.1",
+    "react-tabs": "^3.2.3",
     "styled-components": "^5.1.0",
     "typescript": "~3.7.2",
     "yup": "^0.31.0"
@@ -57,6 +58,7 @@
     "@types/react-router-dom": "^5.1.4",
     "@types/react-select": "^3.0.26",
     "@types/react-table": "^7.0.25",
+    "@types/react-tabs": "^2.3.4",
     "@types/styled-components": "^5.1.0",
     "@types/yup": "^0.29.9",
     "@typescript-eslint/eslint-plugin": "^2.28.0",

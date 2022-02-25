@@ -22,6 +22,8 @@ import {
   TableFilter,
   TableContainer,
 } from './styles';
+import { monthsShort } from 'moment';
+import { isTemplateTail } from 'typescript';
 
 interface ITransaction {
   id: string;
@@ -54,9 +56,16 @@ interface ICategory {
   title: string;
 }
 
-const month = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+interface IDate {
+  year: number;
+  month: string;
+}
 
-const DashboardPerMonth: React.FC = () => {
+interface IDate2 {
+  [year: string]: string[];
+}
+
+const DashboardPerMonthTabs: React.FC = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [balance, setBalance] = useState<IBalance>({} as IBalance);
   const [filteredBalance, setfilteredBalance] = useState<IBalance>(
@@ -64,8 +73,7 @@ const DashboardPerMonth: React.FC = () => {
   );
 
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [filterMonth, setFilterMonth] = useState('04');
-  const [filterYear, setFilterYear] = useState('2021');
+  const [tabsYearsMonths, setTabsYearsMonths] = useState<IDate2[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -88,18 +96,31 @@ const DashboardPerMonth: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get('/transactions/filtered', {
-        params: {
-          month: filterMonth,
-          year: filterYear,
-        },
-      });
+      const response = await api.get('/transactions');
 
       // const transactionsFiltered = response.data.transactions.filter(
       //   (transaction: Transaction) =>
       //     new Date(transaction.created_at).getMonth() === Number(filterMonth) &&
       //     new Date(transaction.created_at).getFullYear() === Number(filterYear),
       // );
+      const dates = response.data.transactions.map((transaction: ITransaction) => ({
+        year: new Date(transaction.date).getFullYear(),
+        month: new Date(transaction.date).toLocaleString('default', {
+          month: 'long',
+        }),
+      }),
+      );
+
+      const filteredDates = Object.values(dates.reduce((r: any, e: IDate) => {
+        let key = e.year + '|' + e.month;
+        if (!r[key]) r[key] = e;
+        return r;
+      }, {})).reduce((r: any, a: any) => {
+        r[a.year] = [...r[a.year] || [], a.month];
+        return r;
+      }, {});
+
+      console.log(filteredDates);
 
       const transactionsFormatted = response.data.transactions.map(
         (transaction: ITransaction) => ({
@@ -115,8 +136,11 @@ const DashboardPerMonth: React.FC = () => {
         total: formatValue(response.data.balance.total),
       };
 
+      console.log(balanceFormatted)
+
       setTransactions(transactionsFormatted);
       setBalance(balanceFormatted);
+      // setTabsYearsMonths(filteredDates);
     }
 
     loadTransactions();
@@ -127,7 +151,7 @@ const DashboardPerMonth: React.FC = () => {
     }
 
     loadCategories();
-  }, [filterMonth, filterYear]);
+  }, []);
 
   async function handleDelete(id: string): Promise<void> {
     try {
@@ -237,66 +261,24 @@ const DashboardPerMonth: React.FC = () => {
           </Card>
         </CardContainer>
 
-        <TableFilter>
-          <label htmlFor="year">Escolha um ano:</label>
-
-          <select
-            name="year"
-            id="year"
-            value={filterYear}
-            onChange={e => setFilterYear(e.target.value)}
-          >
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-          </select>
-        </TableFilter>
-
-        <TableFilter>
-          <label htmlFor="month">Escolha um mês:</label>
-
-          <select
-            name="month"
-            id="month"
-            value={filterMonth}
-            onChange={e => setFilterMonth(e.target.value)}
-          >
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
-        </TableFilter>
-
         <Tabs forceRenderTabPanel defaultIndex={1}>
           <TabList>
-            {transactions
-              .map(transaction => new Date(transaction.date).getFullYear())
-              .filter((v, i, a) => a.indexOf(v) === i)
-              .map(ano => (
-                <Tab>{ano}</Tab>
-              ))}
+            {
+
+            }
           </TabList>
           <TabPanel>
             <Tabs forceRenderTabPanel>
               <TabList>
-                {transactions
-                  .map(transaction => new Date(transaction.date).getMonth())
-                  .filter((v, i, a) => a.indexOf(v) === i)
-                  .map(mes => (
-                    <Tab>{month[mes]}</Tab>
-                  ))}
+                {tabsYearsMonths
+                  .map(year =>
+                    <Tab>{year}</Tab>
+                  )}
               </TabList>
             </Tabs>
           </TabPanel>
         </Tabs>
+
         <TableContainer>
           <table>
             <thead>
@@ -333,9 +315,9 @@ const DashboardPerMonth: React.FC = () => {
             </tbody>
           </table>
         </TableContainer>
-      </Container>
+      </Container >
     </>
   );
 };
 
-export default DashboardPerMonth;
+export default DashboardPerMonthTabs;
