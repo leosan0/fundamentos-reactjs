@@ -57,12 +57,21 @@ interface ICategory {
 }
 
 interface IDate {
-  year: number;
-  month: string;
+  year: string;
+  month: string[];
 }
 
 interface IDate2 {
   [year: string]: string[];
+}
+
+interface IDate3 {
+  year: string;
+  month: string;
+}
+
+interface IDate4 {
+  month: string[];
 }
 
 const DashboardPerMonthTabs: React.FC = () => {
@@ -111,16 +120,27 @@ const DashboardPerMonthTabs: React.FC = () => {
       }),
       );
 
-      const filteredDates = Object.values(dates.reduce((r: any, e: IDate) => {
-        let key = e.year + '|' + e.month;
-        if (!r[key]) r[key] = e;
-        return r;
-      }, {})).reduce((r: any, a: any) => {
-        r[a.year] = [...r[a.year] || [], a.month];
-        return r;
-      }, {});
+      const datesYearMonths: IDate[] = [];
 
-      console.log(filteredDates);
+      dates.map((ar: IDate3) => {
+        let index = -1;
+        index = datesYearMonths.findIndex(date => date.year === ar.year);
+        if (index >= 0) {
+          if (dates[index].month.findIndex((m) => m === ar.month) < 0) {
+            datesYearMonths[index].month.push(ar.month);
+          }
+        } else {
+          datesYearMonths.push({
+            year: ar.year,
+            month: [
+              ar.month
+            ]
+          });
+        }
+      });
+
+      console.log(datesYearMonths);
+
 
       const transactionsFormatted = response.data.transactions.map(
         (transaction: ITransaction) => ({
