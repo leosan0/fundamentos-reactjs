@@ -4,6 +4,8 @@ import { FiTrash } from 'react-icons/fi';
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
+import { monthsShort } from 'moment';
+import { isTemplateTail } from 'typescript';
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
 import total from '../../assets/total.svg';
@@ -12,7 +14,6 @@ import api from '../../services/api';
 
 import Header from '../../components/Header';
 import ModalAddTransaction from '../../components/ModalAddTransaction';
-import MonthYearPicker from '../../components/MonthYearPicker';
 
 import formatValue from '../../utils/formatValue';
 
@@ -55,22 +56,21 @@ interface ICategory {
   title: string;
 }
 
-const month = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro',
-];
+interface IDate {
+  year: string;
+  month: string[];
+}
 
-const DashboardPerMonth: React.FC = () => {
+interface IDate2 {
+  [year: string]: string[];
+}
+
+interface IDate3 {
+  year: string;
+  month: string;
+}
+
+const DashboardPerMonthTabs: React.FC = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [balance, setBalance] = useState<IBalance>({} as IBalance);
   const [filteredBalance, setfilteredBalance] = useState<IBalance>(
@@ -78,8 +78,7 @@ const DashboardPerMonth: React.FC = () => {
   );
 
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [filterMonth, setFilterMonth] = useState('04');
-  const [filterYear, setFilterYear] = useState('2021');
+  const [tabsYearsMonths, setTabsYearsMonths] = useState<IDate[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -102,18 +101,40 @@ const DashboardPerMonth: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get('/transactions/filtered', {
-        params: {
-          month: filterMonth,
-          year: filterYear,
-        },
-      });
+      const response = await api.get('/transactions');
 
       // const transactionsFiltered = response.data.transactions.filter(
       //   (transaction: Transaction) =>
       //     new Date(transaction.created_at).getMonth() === Number(filterMonth) &&
       //     new Date(transaction.created_at).getFullYear() === Number(filterYear),
       // );
+      const dates = response.data.transactions.map(
+        (transaction: ITransaction) => ({
+          year: new Date(transaction.date).getFullYear(),
+          month: new Date(transaction.date).toLocaleString('default', {
+            month: 'long',
+          }),
+        }),
+      );
+
+      const datesYearMonths: IDate[] = [];
+
+      dates.map((ar: IDate3) => {
+        let index = -1;
+        index = datesYearMonths.findIndex(date => date.year === ar.year);
+        if (index >= 0) {
+          if (datesYearMonths[index].month.findIndex(m => m === ar.month) < 0) {
+            datesYearMonths[index].month.push(ar.month);
+          }
+        } else {
+          datesYearMonths.push({
+            year: ar.year,
+            month: [ar.month],
+          });
+        }
+      });
+
+      console.log(datesYearMonths);
 
       const transactionsFormatted = response.data.transactions.map(
         (transaction: ITransaction) => ({
@@ -129,8 +150,11 @@ const DashboardPerMonth: React.FC = () => {
         total: formatValue(response.data.balance.total),
       };
 
+      console.log(balanceFormatted);
+
       setTransactions(transactionsFormatted);
       setBalance(balanceFormatted);
+      setTabsYearsMonths(datesYearMonths);
     }
 
     loadTransactions();
@@ -141,7 +165,7 @@ const DashboardPerMonth: React.FC = () => {
     }
 
     loadCategories();
-  }, [filterMonth, filterYear]);
+  }, [setTabsYearsMonths]);
 
   async function handleDelete(id: string): Promise<void> {
     try {
@@ -251,45 +275,25 @@ const DashboardPerMonth: React.FC = () => {
           </Card>
         </CardContainer>
 
-        <TableFilter>
-          <label htmlFor="year">Escolha um ano:</label>
+        <Tabs forceRenderTabPanel defaultIndex={1}>
+          <TabList>
+            {tabsYearsMonths.map(yearsMonths => (
+              <Tab>{yearsMonths.year}</Tab>
+            ))}
+          </TabList>
 
-          <select
-            name="year"
-            id="year"
-            value={filterYear}
-            onChange={e => setFilterYear(e.target.value)}
-          >
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-          </select>
-        </TableFilter>
-
-        <TableFilter>
-          <label htmlFor="month">Escolha um mês:</label>
-
-          <select
-            name="month"
-            id="month"
-            value={filterMonth}
-            onChange={e => setFilterMonth(e.target.value)}
-          >
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
-        </TableFilter>
-
-        <MonthYearPicker name="monthYear" placeholderText="Data" />
+          {tabsYearsMonths.map(yearsMonths => (
+            <TabPanel>
+              <Tabs forceRenderTabPanel>
+                <TabList>
+                  {yearsMonths.month.map(month => (
+                    <Tab>{month}</Tab>
+                  ))}
+                </TabList>
+              </Tabs>
+            </TabPanel>
+          ))}
+        </Tabs>
 
         <TableContainer>
           <table>
@@ -332,4 +336,4 @@ const DashboardPerMonth: React.FC = () => {
   );
 };
 
-export default DashboardPerMonth;
+export default DashboardPerMonthTabs;

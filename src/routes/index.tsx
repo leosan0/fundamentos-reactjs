@@ -6,6 +6,7 @@ import Dashboard from '../pages/Dashboard';
 import Import from '../pages/Import';
 import Insert from '../pages/Insert';
 import DashboardPerMonth from '../pages/DashboardPerMonth';
+import DashboardPerMonthTabs from '../pages/DashboardPerMonthTabs';
 
 const Routes: React.FC = () => (
   <Switch>
@@ -13,6 +14,7 @@ const Routes: React.FC = () => (
     <Route path="/import" component={Import} />
     <Route path="/insert" component={Insert} />
     <Route path="/permonth" component={DashboardPerMonth} />
+    <Route path="/permonthtabs" component={DashboardPerMonthTabs} />
   </Switch>
 );
 
