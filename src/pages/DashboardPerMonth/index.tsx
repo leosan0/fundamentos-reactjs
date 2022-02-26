@@ -10,6 +10,7 @@ import api from '../../services/api';
 
 import Header from '../../components/Header';
 import ModalAddTransaction from '../../components/ModalAddTransaction';
+import MonthYearPicker from '../../components/MonthYearPicker';
 
 import formatValue from '../../utils/formatValue';
 
@@ -270,6 +271,8 @@ const DashboardPerMonth: React.FC = () => {
             <option value="12">Dezembro</option>
           </select>
         </TableFilter>
+
+        <MonthYearPicker name="monthYear" placeholderText="Data" />
 
         <TableContainer>
           <table>
