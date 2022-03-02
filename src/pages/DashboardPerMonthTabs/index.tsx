@@ -61,10 +61,6 @@ interface IDate {
   month: string[];
 }
 
-interface IDate2 {
-  [year: string]: string[];
-}
-
 interface IDate3 {
   year: string;
   month: string;
@@ -133,7 +129,33 @@ const DashboardPerMonthTabs: React.FC = () => {
           });
         }
       });
+      const monthNames = [
+        'janeiro',
+        'fevereiro',
+        'março',
+        'abril',
+        'maio',
+        'junho',
+        'julho',
+        'agosto',
+        'setembro',
+        'outubro',
+        'novembro',
+        'dezembro',
+      ];
 
+      const sortedMonths = datesYearMonths.map(date => {
+        date.month.sort((a, b) => {
+          if (monthNames.indexOf(a) < monthNames.indexOf(b)) {
+            return -1;
+          }
+          if (monthNames.indexOf(a) > monthNames.indexOf(b)) {
+            return 1;
+          }
+          return 0;
+        });
+      });
+      console.log(sortedMonths);
       console.log(datesYearMonths);
 
       const transactionsFormatted = response.data.transactions.map(
