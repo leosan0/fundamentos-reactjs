@@ -4,8 +4,6 @@ import { FiTrash } from 'react-icons/fi';
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { monthsShort } from 'moment';
-import { isTemplateTail } from 'typescript';
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
 import total from '../../assets/total.svg';
@@ -24,6 +22,7 @@ import {
   TableFilter,
   TableContainer,
 } from './styles';
+import { date } from 'yup';
 
 interface ITransaction {
   id: string;
@@ -75,6 +74,8 @@ const DashboardPerMonthTabs: React.FC = () => {
 
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [tabsYearsMonths, setTabsYearsMonths] = useState<IDate[]>([]);
+  const [filterMonth, setFilterMonth] = useState(0);
+  const [filterYear, setFilterYear] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -145,18 +146,29 @@ const DashboardPerMonthTabs: React.FC = () => {
       ];
 
       const sortedMonths = datesYearMonths.map(date => {
-        date.month.sort((a, b) => {
-          if (monthNames.indexOf(a) < monthNames.indexOf(b)) {
-            return -1;
-          }
-          if (monthNames.indexOf(a) > monthNames.indexOf(b)) {
-            return 1;
-          }
-          return 0;
-        });
+        return {
+          year: date.year,
+          month: date.month.map(month => month).sort((a, b) => {
+            if (monthNames.indexOf(a) < monthNames.indexOf(b)) {
+              return -1;
+            }
+            if (monthNames.indexOf(a) > monthNames.indexOf(b)) {
+              return 1;
+            }
+            return 0;
+          })
+        }
       });
-      console.log(sortedMonths);
-      console.log(datesYearMonths);
+
+      const sortedYears = sortedMonths.sort((a, b) => {
+        if (a.year < b.year) {
+          return - 1;
+        }
+        if (a.year > b.year) {
+          return 1;
+        }
+        return 0;
+      });
 
       const transactionsFormatted = response.data.transactions.map(
         (transaction: ITransaction) => ({
@@ -166,17 +178,24 @@ const DashboardPerMonthTabs: React.FC = () => {
         }),
       );
 
+      const transactionsFiltered = transactionsFormatted.filter(
+        (transaction: ITransaction) =>
+          new Date(transaction.date).toLocaleString('default', {
+            month: 'long',
+          }) === sortedMonths[filterYear].month[filterMonth] &&
+          new Date(transaction.date).getFullYear() ===
+          Number(sortedMonths[filterYear].year),
+      );
+
       const balanceFormatted = {
         income: formatValue(response.data.balance.income),
         outcome: formatValue(response.data.balance.outcome),
         total: formatValue(response.data.balance.total),
       };
 
-      console.log(balanceFormatted);
-
-      setTransactions(transactionsFormatted);
+      setTransactions(transactionsFiltered);
       setBalance(balanceFormatted);
-      setTabsYearsMonths(datesYearMonths);
+      setTabsYearsMonths(sortedYears);
     }
 
     loadTransactions();
@@ -187,7 +206,7 @@ const DashboardPerMonthTabs: React.FC = () => {
     }
 
     loadCategories();
-  }, [setTabsYearsMonths]);
+  }, [filterMonth, filterYear]);
 
   async function handleDelete(id: string): Promise<void> {
     try {
@@ -297,7 +316,14 @@ const DashboardPerMonthTabs: React.FC = () => {
           </Card>
         </CardContainer>
 
-        <Tabs forceRenderTabPanel defaultIndex={1}>
+        <Tabs
+          selectedIndex={filterYear}
+          onSelect={index => {
+            setFilterYear(index);
+            setFilterMonth(0);
+          }}
+          forceRenderTabPanel
+        >
           <TabList>
             {tabsYearsMonths.map(yearsMonths => (
               <Tab>{yearsMonths.year}</Tab>
@@ -306,7 +332,11 @@ const DashboardPerMonthTabs: React.FC = () => {
 
           {tabsYearsMonths.map(yearsMonths => (
             <TabPanel>
-              <Tabs forceRenderTabPanel>
+              <Tabs
+                forceRenderTabPanel
+                selectedIndex={filterMonth}
+                onSelect={index => setFilterMonth(index)}
+              >
                 <TabList>
                   {yearsMonths.month.map(month => (
                     <Tab>{month}</Tab>
