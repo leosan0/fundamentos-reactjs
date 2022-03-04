@@ -19,8 +19,11 @@ import {
   Container,
   CardContainer,
   Card,
-  TableFilter,
   TableContainer,
+  STabs,
+  STab,
+  STabList,
+  STabPanel,
 } from './styles';
 import { date } from 'yup';
 
@@ -316,7 +319,7 @@ const DashboardPerMonthTabs: React.FC = () => {
           </Card>
         </CardContainer>
 
-        <Tabs
+        <STabs
           selectedIndex={filterYear}
           onSelect={index => {
             setFilterYear(index);
@@ -324,11 +327,11 @@ const DashboardPerMonthTabs: React.FC = () => {
           }}
           forceRenderTabPanel
         >
-          <TabList>
+          <STabList>
             {tabsYearsMonths.map(yearsMonths => (
-              <Tab>{yearsMonths.year}</Tab>
+              <STab>{yearsMonths.year}</STab>
             ))}
-          </TabList>
+          </STabList>
 
           {tabsYearsMonths.map(yearsMonths => (
             <TabPanel>
@@ -345,7 +348,7 @@ const DashboardPerMonthTabs: React.FC = () => {
               </Tabs>
             </TabPanel>
           ))}
-        </Tabs>
+        </STabs>
 
         <TableContainer>
           <table>

@@ -1,4 +1,6 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 
 interface CardProps {
   total?: boolean;
@@ -9,6 +11,41 @@ export const Container = styled.div`
   max-width: 1120px;
   margin: 0 auto;
   padding: 40px 20px;
+`;
+
+export const STabs = styled(Tabs)`
+  -webkit-tap-highlight-color: transparent;
+`;
+export const STabList = styled(TabList)`
+  border-bottom: 1px solid #aaa;
+  margin: 0 0 10px;
+  padding: 0;
+`;
+export const STab = styled(Tab)`
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+
+  ${props => props.selected && css`
+      background: #fff;
+      border-color: #aaa;
+      color: black;
+      border-radius: 5px 5px 0 0;
+  `}
+
+  ${props => props.onFocus && css`
+      box-shadow: 0 0 5px hsl(208, 99%, 50%);
+      border-color: hsl(208, 99%, 50%);
+      outline: none;
+  `}
+`;
+export const STabPanel = styled(TabPanel)`
+  display: none;
 `;
 
 export const Title = styled.h1`
