@@ -15,6 +15,7 @@ export const Container = styled.div`
 
 export const STabs = styled(Tabs)`
   -webkit-tap-highlight-color: transparent;
+  margin: 32px 0px;
 `;
 export const STabList = styled(TabList)`
   border-bottom: 1px solid #aaa;
@@ -42,10 +43,24 @@ export const STab = styled(Tab)`
       box-shadow: 0 0 5px hsl(208, 99%, 50%);
       border-color: hsl(208, 99%, 50%);
       outline: none;
+
+      &:after {
+        content: '';
+        position: absolute;
+        height: 5px;
+        left: -4px;
+        right: -4px;
+        bottom: -5px;
+        background: #fff;
+      }
   `}
 `;
 export const STabPanel = styled(TabPanel)`
   display: none;
+
+  ${props => props.selected && css`
+      display: block;
+  `}
 `;
 
 export const Title = styled.h1`
@@ -87,7 +102,7 @@ export const Card = styled.div`
 export const TableFilter = styled.section``;
 
 export const TableContainer = styled.section`
-  margin-top: 64px;
+  margin-top: 0px;
 
   table {
     width: 100%;

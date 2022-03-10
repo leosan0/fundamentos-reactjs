@@ -68,6 +68,12 @@ interface IDate3 {
   month: string;
 }
 
+interface IBalance2 {
+  income: number;
+  outcome: number;
+  total: number;
+}
+
 const DashboardPerMonthTabs: React.FC = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [balance, setBalance] = useState<IBalance>({} as IBalance);
@@ -190,10 +196,38 @@ const DashboardPerMonthTabs: React.FC = () => {
           Number(sortedMonths[filterYear].year),
       );
 
+      console.log(transactionsFiltered);
+
+      const { income, outcome } = transactionsFiltered.reduce(
+        (accumulator: IBalance2, transaction: ITransaction) => {
+          switch (transaction.type) {
+            case 'income':
+              accumulator.income += Number(transaction.value);
+              break;
+
+            case 'outcome':
+              accumulator.outcome += Number(transaction.value);
+              break;
+
+            default:
+              break;
+          }
+
+          return accumulator;
+        },
+        {
+          income: 0,
+          outcome: 0,
+          total: 0,
+        },
+      );
+
+      const dif = income - outcome;
+
       const balanceFormatted = {
-        income: formatValue(response.data.balance.income),
-        outcome: formatValue(response.data.balance.outcome),
-        total: formatValue(response.data.balance.total),
+        income: formatValue(income),
+        outcome: formatValue(outcome),
+        total: formatValue(dif),
       };
 
       setTransactions(transactionsFiltered);
